@@ -4,19 +4,6 @@
   canvasSize = 300;
 
   $(function() {
-
-    /*
-    	fun = (x) ->
-     	console.log(A)
-     	A += 1
-    
-     * Cache elements
-    	$canvas = $('canvas')
-    	$h1 = $('h1')
-    	A = 0
-     * Alert the user when they don't click either shape on the canvas
-    	$(document).ready(()-> $canvas.on('mousedown', fun()))
-     */
     var canvas, ctx, drawCircle, drawGrid, drawLine, drawSWC, mousePos;
     mousePos = function(evt) {
       var mouseX, mouseY, rect, root;
@@ -44,11 +31,6 @@
     ctx = canvas.getContext('2d');
     ctx.fillStyle = '#002b36';
     ctx.fillRect(0, 0, canvasSize, canvasSize);
-
-    /*ctx.font = '30px Arial'
-    ctx.fillStyle = 'white'
-    ctx.fillText("works", 40, 150)
-     */
     drawGrid = function() {
       var c, t;
       c = "white";
@@ -80,3 +62,4 @@
   });
 
 }).call(this);
+
