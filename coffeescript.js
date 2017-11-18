@@ -1,21 +1,61 @@
 (function() {
-  var canvasSize;
+  var canvasSize, turn;
 
   canvasSize = 300;
 
+  turn = 0;
+
   $(function() {
-    var canvas, ctx, drawCircle, drawGrid, drawLine, drawSWC, mousePos;
-    mousePos = function(evt) {
-      var mouseX, mouseY, rect, root;
-      rect = canvas.getBoundingClientRect();
-      root = document.documentElement;
-      mouseX = evt.clientX - rect.left - root.scrollLeft;
-      mouseY = evt.clientY - rect.top - root.scrollTop;
-      console.log([mouseX, mouseY]);
-      return {
-        x: mouseX,
-        y: mouseY
-      };
+    var canvas, ctx, doMouseDown, drawCircle, drawGrid, drawLine, drawMove, drawSWC, initialise;
+    initialise = function() {
+      var canvas;
+      canvas = document.getElementById("myCanvas");
+      return canvas.addEventListener("mousedown", doMouseDown, false);
+    };
+    doMouseDown = function(event) {
+      var X, Y, s;
+      X = event.pageX;
+      Y = event.pageY;
+      s = [0, 0];
+      if (X > 10 && X < 105) {
+        s[0] = 0;
+        if (Y > 10 && Y < 105) {
+          s[1] = 0;
+        } else if (Y > 110 && Y < 205) {
+          s[1] = 1;
+        } else if (Y > 210 && Y < 305) {
+          s[1] = 2;
+        }
+      } else if (X > 110 && X < 205) {
+        s[0] = 1;
+        if (Y > 10 && Y < 105) {
+          s[1] = 0;
+        } else if (Y > 110 && Y < 205) {
+          s[1] = 1;
+        } else if (Y > 210 && Y < 305) {
+          s[1] = 2;
+        }
+      } else if (X > 210 && X < 305) {
+        s[0] = 2;
+        if (Y > 10 && Y < 105) {
+          s[1] = 0;
+        } else if (Y > 110 && Y < 205) {
+          s[1] = 1;
+        } else if (Y > 210 && Y < 305) {
+          s[1] = 2;
+        }
+      }
+      console.log("Mouse: x = " + X + ", y = " + Y + ", Square " + s + " ");
+      drawMove(s);
+      return s;
+    };
+    drawMove = function(s) {
+      if (turn % 2 === 0) {
+        drawSWC(s[0], s[1]);
+      } else if (turn % 2 === 1) {
+        drawCircle(s[0], s[1]);
+      }
+      return turn += 1;
     };
     drawLine = function(x0, y0, x1, y1, color, lineWidth) {
       ctx.beginPath();
@@ -31,6 +71,12 @@
     ctx = canvas.getContext('2d');
     ctx.fillStyle = '#002b36';
     ctx.fillRect(0, 0, canvasSize, canvasSize);
+    initialise();
+
+    /*ctx.font = '30px Arial'
+    ctx.fillStyle = 'white'
+    ctx.fillText("works", 40, 150)
+     */
     drawGrid = function() {
       var c, t;
       c = "white";
@@ -55,11 +101,19 @@
       return drawLine(x * 100 + p, y * 100 + 100 - p, x * 100 + 100 - p, y * 100 + p, "#CF0C23", 5);
     };
     drawGrid();
-    drawCircle(1, 1);
-    drawCircle(0, 0);
-    drawSWC(1, 0);
-    return drawSWC(2, 0);
+
+    /*
+    		drawCircle(1,1)
+    		drawCircle(0,0)
+    		drawCircle(2,1)
+    		drawCircle(1,2)
+    		drawSWC(1,0)
+    		drawSWC(2,0)
+    		drawSWC(2,2)
+    		drawSWC(0,1)
+    		drawSWC(0,2)
+     */
+    return console.log("end of initalise");
   });
 
 }).call(this);
-
