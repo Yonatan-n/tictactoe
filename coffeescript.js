@@ -48,7 +48,7 @@
         }
       }
       console.log(s);
-      if (checkIfIn(s)) {
+      if (checkIfIn(s) === true) {
         gridMoves.push(s);
         console.log(gridMoves);
         if (turn % 2 === 0) {
