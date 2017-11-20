@@ -1,12 +1,14 @@
 (function() {
-  var canvasSize, turn;
+  var canvasSize, gridMoves, turn;
 
   canvasSize = 300;
 
   turn = 0;
 
+  gridMoves = [];
+
   $(function() {
-    var canvas, ctx, doMouseDown, drawCircle, drawGrid, drawLine, drawMove, drawSWC, initialise;
+    var canvas, checkIfIn, ctx, doMouseDown, drawCircle, drawGrid, drawLine, drawSWC, initialise;
     initialise = function() {
       var canvas;
       canvas = document.getElementById("myCanvas");
@@ -20,7 +22,7 @@
       if (X > 10 && X < 105) {
         s[0] = 0;
         if (Y > 10 && Y < 105) {
-          s[1] = 0;
+          s = [0, 0];
         } else if (Y > 110 && Y < 205) {
           s[1] = 1;
         } else if (Y > 210 && Y < 305) {
@@ -45,18 +47,41 @@
           s[1] = 2;
         }
       }
-      console.log("Mouse: x = " + X + ", y = " + Y + ", Square " + s + " ");
-      drawMove(s);
+      console.log(s);
+      if (checkIfIn(s)) {
+        gridMoves.push(s);
+        console.log(gridMoves);
+        if (turn % 2 === 0) {
+          drawSWC(s[0], s[1]);
+        } else if (turn % 2 === 1) {
+          drawCircle(s[0], s[1]);
+        }
+        turn += 1;
+        console.log(s);
+      }
       return s;
     };
-    drawMove = function(s) {
-      if (turn % 2 === 0) {
-        drawSWC(s[0], s[1]);
-      } else if (turn % 2 === 1) {
-        drawCircle(s[0], s[1]);
+    checkIfIn = function(s) {
+      var i, len, sqr;
+      for (i = 0, len = gridMoves.length; i < len; i++) {if (window.CP.shouldStopExecution(1)){break;}
+        sqr = gridMoves[i];
+        if (JSON.stringify(s) === JSON.stringify(sqr)) {
+          return false;
+        }
       }
-      return turn += 1;
+window.CP.exitedLoop(1);
+
+      return true;
     };
+
+    /*drawMove = (s) ->
+    		if s not in gridMoves
+    			gridMoves.push(s)
+    			if turn % 2 == 0 then drawSWC(s[0], s[1])
+    			else if turn % 2 == 1 then drawCircle(s[0], s[1])
+    			turn += 1
+    			console.log s
+     */
     drawLine = function(x0, y0, x1, y1, color, lineWidth) {
       ctx.beginPath();
       ctx.moveTo(x0, y0);
