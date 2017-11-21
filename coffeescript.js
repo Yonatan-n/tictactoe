@@ -1,70 +1,78 @@
 (function() {
-  var canvasSize, gridMoves, turn;
+  var canvasSize, gridMoves, gridSign, turn, won;
 
   canvasSize = 300;
 
   turn = 0;
 
+  won = false;
+
   gridMoves = [];
 
+  gridSign = [9, 9, 9, 9, 9, 9, 9, 9, 9];
+
   $(function() {
-    var canvas, checkIfIn, ctx, doMouseDown, drawCircle, drawGrid, drawLine, drawSWC, initialise;
+    var canvas, checkIfIn, checkIfWon, ctx, doMouseDown, drawCircle, drawGrid, drawLine, drawSWC, initialise;
     initialise = function() {
       var canvas;
       canvas = document.getElementById("myCanvas");
       return canvas.addEventListener("mousedown", doMouseDown, false);
     };
     doMouseDown = function(event) {
-      var X, Y, s;
-      X = event.pageX;
-      Y = event.pageY;
-      s = [0, 0];
-      if (X > 10 && X < 105) {
-        s[0] = 0;
-        if (Y > 10 && Y < 105) {
-          s = [0, 0];
-        } else if (Y > 110 && Y < 205) {
-          s[1] = 1;
-        } else if (Y > 210 && Y < 305) {
-          s[1] = 2;
+      var X, Y, s, temp;
+      if (won === false) {
+        X = event.pageX;
+        Y = event.pageY;
+        s = [0, 0];
+        if (X > 10 && X < 105) {
+          s[0] = 0;
+          if (Y > 10 && Y < 105) {
+            s = [0, 0];
+          } else if (Y > 110 && Y < 205) {
+            s[1] = 1;
+          } else if (Y > 210 && Y < 305) {
+            s[1] = 2;
+          }
+        } else if (X > 110 && X < 205) {
+          s[0] = 1;
+          if (Y > 10 && Y < 105) {
+            s[1] = 0;
+          } else if (Y > 110 && Y < 205) {
+            s[1] = 1;
+          } else if (Y > 210 && Y < 305) {
+            s[1] = 2;
+          }
+        } else if (X > 210 && X < 305) {
+          s[0] = 2;
+          if (Y > 10 && Y < 105) {
+            s[1] = 0;
+          } else if (Y > 110 && Y < 205) {
+            s[1] = 1;
+          } else if (Y > 210 && Y < 305) {
+            s[1] = 2;
+          }
         }
-      } else if (X > 110 && X < 205) {
-        s[0] = 1;
-        if (Y > 10 && Y < 105) {
-          s[1] = 0;
-        } else if (Y > 110 && Y < 205) {
-          s[1] = 1;
-        } else if (Y > 210 && Y < 305) {
-          s[1] = 2;
+        if (checkIfIn(s) === true) {
+          temp = (s[1] * 3) + (s[0] % 3);
+          gridMoves.push(s);
+          if (turn % 2 === 0) {
+            drawSWC(s[0], s[1]);
+            gridSign[temp] = 1;
+          } else if (turn % 2 === 1) {
+            drawCircle(s[0], s[1]);
+            gridSign[temp] = 0;
+          }
+          turn += 1;
+          console.log(gridSign);
         }
-      } else if (X > 210 && X < 305) {
-        s[0] = 2;
-        if (Y > 10 && Y < 105) {
-          s[1] = 0;
-        } else if (Y > 110 && Y < 205) {
-          s[1] = 1;
-        } else if (Y > 210 && Y < 305) {
-          s[1] = 2;
-        }
+        checkIfWon();
+        return s;
       }
-      console.log(s);
-      if (checkIfIn(s) === true) {
-        gridMoves.push(s);
-        console.log(gridMoves);
-        if (turn % 2 === 0) {
-          drawSWC(s[0], s[1]);
-        } else if (turn % 2 === 1) {
-          drawCircle(s[0], s[1]);
-        }
-        turn += 1;
-        console.log(s);
-      }
-      return s;
     };
     checkIfIn = function(s) {
-      var i, len, sqr;
-      for (i = 0, len = gridMoves.length; i < len; i++) {if (window.CP.shouldStopExecution(1)){break;}
-        sqr = gridMoves[i];
+      var j, len, sqr;
+      for (j = 0, len = gridMoves.length; j < len; j++) {if (window.CP.shouldStopExecution(1)){break;}
+        sqr = gridMoves[j];
         if (JSON.stringify(s) === JSON.stringify(sqr)) {
           return false;
         }
@@ -73,15 +81,51 @@ window.CP.exitedLoop(1);
 
       return true;
     };
+    checkIfWon = function() {
+      var i, j, results;
+      if (gridSign[0] + gridSign[4] + gridSign[8] === 3) {
+        drawLine(0, 0, 300, 300, "#CF0C23", 16);
+        won = true;
+        console.log("X has won");
+      } else if (gridSign[2] + gridSign[4] + gridSign[6] === 3) {
+        drawLine(300, 0, 0, 300, "#CF0C23", 16);
+        won = true;
+        console.log("X has won");
+      } else if (gridSign[0] + gridSign[4] + gridSign[8] === 0) {
+        drawLine(0, 0, 300, 300, "#0CB09D", 16);
+        won = true;
+        console.log("O has won");
+      } else if (gridSign[2] + gridSign[4] + gridSign[6] === 0) {
+        drawLine(0, 300, 300, 0, "#0CB09D", 16);
+        won = true;
+        console.log("O has won");
+      }
+      results = [];
+      for (i = j = 0; j <= 8; i = j += 3) {if (window.CP.shouldStopExecution(2)){break;}
+        if (gridSign[0 + i] + gridSign[1 + i] + gridSign[2 + i] === 3) {
+          drawLine(0, (Math.floor(i / 3)) * 100 + 50, 300, (Math.floor(i / 3)) * 100 + 50, "#CF0C23", 16);
+          won = true;
+          results.push(console.log("X has won"));
+        } else if (gridSign[0 + i] + gridSign[1 + i] + gridSign[2 + i] === 0) {
+          drawLine(0, (Math.floor(i / 3)) * 100 + 50, 300, (Math.floor(i / 3)) * 100 + 50, "#0CB09D", 16);
+          won = true;
+          results.push(console.log("O has won"));
+        } else if (gridSign[0 + (Math.floor(i / 3))] + gridSign[3 + (Math.floor(i / 3))] + gridSign[6 + (Math.floor(i / 3))] === 3) {
+          drawLine((Math.floor(i / 3)) * 100 + 50, 0, (Math.floor(i / 3)) * 100 + 50, 300, "#CF0C23", 16);
+          won = true;
+          results.push(console.log("X has won"));
+        } else if (gridSign[0 + (Math.floor(i / 3))] + gridSign[3 + (Math.floor(i / 3))] + gridSign[6 + (Math.floor(i / 3))] === 0) {
+          drawLine((Math.floor(i / 3)) * 100 + 50, 0, (Math.floor(i / 3)) * 100 + 50, 300, "#0CB09D", 16);
+          won = true;
+          results.push(console.log("O has won"));
+        } else {
+          results.push(void 0);
+        }
+      }
+window.CP.exitedLoop(2);
 
-    /*drawMove = (s) ->
-    		if s not in gridMoves
-    			gridMoves.push(s)
-    			if turn % 2 == 0 then drawSWC(s[0], s[1])
-    			else if turn % 2 == 1 then drawCircle(s[0], s[1])
-    			turn += 1
-    			console.log s
-     */
+      return results;
+    };
     drawLine = function(x0, y0, x1, y1, color, lineWidth) {
       ctx.beginPath();
       ctx.moveTo(x0, y0);
@@ -126,18 +170,6 @@ window.CP.exitedLoop(1);
       return drawLine(x * 100 + p, y * 100 + 100 - p, x * 100 + 100 - p, y * 100 + p, "#CF0C23", 5);
     };
     drawGrid();
-
-    /*
-    		drawCircle(1,1)
-    		drawCircle(0,0)
-    		drawCircle(2,1)
-    		drawCircle(1,2)
-    		drawSWC(1,0)
-    		drawSWC(2,0)
-    		drawSWC(2,2)
-    		drawSWC(0,1)
-    		drawSWC(0,2)
-     */
     return console.log("end of initalise");
   });
 
