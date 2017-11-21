@@ -1,6 +1,6 @@
 (function() {
   var canvasSize, gridMoves, gridSign, turn, won;
-
+  var Window = 0
   canvasSize = 300;
 
   turn = 0;
@@ -63,7 +63,7 @@
             gridSign[temp] = 0;
           }
           turn += 1;
-          console.log(gridSign);
+          //console.log(gridSign);
         }
         checkIfWon();
         return s;
@@ -71,18 +71,20 @@
     };
     checkIfIn = function(s) {
       var j, len, sqr;
-      for (j = 0, len = gridMoves.length; j < len; j++) {if (window.CP.shouldStopExecution(1)){break;}
+      var Window = 0
+      for (j = 0, len = gridMoves.length; j < len; j++) {if (Window == 1){break;}
         sqr = gridMoves[j];
         if (JSON.stringify(s) === JSON.stringify(sqr)) {
           return false;
         }
       }
-window.CP.exitedLoop(1);
+Window = 1;
 
       return true;
     };
     checkIfWon = function() {
       var i, j, results;
+      var Window = 0
       if (gridSign[0] + gridSign[4] + gridSign[8] === 3) {
         drawLine(0, 0, 300, 300, "#CF0C23", 16);
         won = true;
@@ -101,7 +103,7 @@ window.CP.exitedLoop(1);
         console.log("O has won");
       }
       results = [];
-      for (i = j = 0; j <= 8; i = j += 3) {if (window.CP.shouldStopExecution(2)){break;}
+      for (i = j = 0; j <= 8; i = j += 3) {if (Window == 2){break;}
         if (gridSign[0 + i] + gridSign[1 + i] + gridSign[2 + i] === 3) {
           drawLine(0, (Math.floor(i / 3)) * 100 + 50, 300, (Math.floor(i / 3)) * 100 + 50, "#CF0C23", 16);
           won = true;
@@ -122,7 +124,7 @@ window.CP.exitedLoop(1);
           results.push(void 0);
         }
       }
-window.CP.exitedLoop(2);
+Window = 2;
 
       return results;
     };
