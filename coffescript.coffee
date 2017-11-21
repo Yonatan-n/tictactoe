@@ -1,43 +1,104 @@
 canvasSize = 300
 turn = 0
-#gridMoves = [	[0, 0],[0,1],[0,2],
-#			 	[1,0], [1,1], [1,2],
-#				[2,0], [2,1], [2,2]]
+won = false
+gridMoves = [] #[ [0, 0], [0, 1], [0, 2], [1, 0], [1, 1], [1, 2], [2, 0], [2, 1], [2, 2] ]
+gridSign = [9, 9, 9,
+		   	9, 9, 9,
+		   	9, 9, 9]
 $ -> # Main Function, Draws Everything
 	initialise = () ->
 		canvas = document.getElementById("myCanvas")
 		canvas.addEventListener("mousedown", doMouseDown, false)
 		
 	doMouseDown = (event) ->
-		X = event.pageX
-		Y = event.pageY
-		s = [0, 0]
-		
-		if X > 10 && X < 105 
-			s[0] = 0
-			if Y > 10 && Y < 105 then	s[1] = 0
-			else if Y > 110 && Y < 205 then	s[1] = 1
-			else if Y > 210 && Y < 305 then	s[1] = 2 
-		else if X > 110 && X < 205
-			s[0] = 1
-			if Y > 10 && Y < 105 then	s[1] = 0
-			else if Y > 110 && Y < 205 then	s[1] = 1
-			else if Y > 210 && Y < 305 then	s[1] = 2
-		else if X > 210 && X < 305
-			s[0] = 2
-			if Y > 10 && Y < 105 then s[1] = 0
-			else if Y > 110 && Y < 205 then	s[1] = 1
-			else if Y > 210 && Y < 305 then	s[1] = 2
-		# this parse the right squre ^
-		console.log("Mouse: x = #{X}, y = #{Y}, Square #{s} ")
-		drawMove(s)
-		#whereToDraw(s[0], s[1])
-		return s
+		if won == false
+			X = event.pageX
+			Y = event.pageY
+			s = [0, 0]
+
+			if X > 10 && X < 105 
+				s[0] = 0
+				if Y > 10 && Y < 105 then	s = [0, 0]
+				else if Y > 110 && Y < 205 then	s[1] = 1
+				else if Y > 210 && Y < 305 then	s[1] = 2 
+			else if X > 110 && X < 205
+				s[0] = 1
+				if Y > 10 && Y < 105 then	s[1] = 0
+				else if Y > 110 && Y < 205 then	s[1] = 1
+				else if Y > 210 && Y < 305 then	s[1] = 2
+			else if X > 210 && X < 305
+				s[0] = 2
+				if Y > 10 && Y < 105 then s[1] = 0
+				else if Y > 110 && Y < 205 then	s[1] = 1
+				else if Y > 210 && Y < 305 then	s[1] = 2
+			# this parse the right squre ^
+
+			if checkIfIn(s) == true
+				#gridMoves.splice(indexOf(s), 1)
+				temp = (s[1] * 3 ) + (s[0] % 3)
+				gridMoves.push(s)
+
+				#gridSign = gridMoves.slice(0)
+				#gridSign = 2
+				#console.log gridMoves
+				if turn % 2 == 0
+					drawSWC(s[0], s[1])
+					gridSign[temp] = 1
+				else if turn % 2 == 1
+					drawCircle(s[0], s[1])
+					gridSign[temp] = 0
+				turn += 1
+				console.log gridSign
+
+			checkIfWon()			
+			#drawLine(0, 0, 300, 300, "yellow", 16)
+			#whereToDraw(s[0], s[1])
+			return s
+	# ^ ^ ^ End of main function - draw x and O by turn and check if someone won yet ^
+	checkIfIn = (s) ->
+		for sqr in gridMoves
+			if JSON.stringify(s) == JSON.stringify(sqr)
+				return false
+		return true
 	
-	drawMove = (s) ->
-		if turn % 2 == 0 then drawSWC(s[0], s[1])
-		else if turn % 2 == 1 then drawCircle(s[0], s[1])
-		turn += 1
+	checkIfWon = () ->
+		if gridSign[0] + gridSign[4] + gridSign[8] == 3
+			drawLine(0, 0, 300, 300 , "#CF0C23", 16)
+			won = true
+			console.log "X has won"
+		else if gridSign[2] + gridSign[4] + gridSign[6] == 3
+			drawLine(300, 0, 0, 300 , "#CF0C23", 16)
+			won = true
+			console.log "X has won"
+		else if gridSign[0] + gridSign[4] + gridSign[8] == 0
+			drawLine(0, 0, 300, 300 , "#0CB09D", 16)
+			won = true
+			console.log "O has won"
+		else if gridSign[2] + gridSign[4] + gridSign[6] == 0
+			drawLine(0, 300, 300, 0 , "#0CB09D", 16)
+			won = true
+			console.log "O has won"	
+			#
+		for i in [0..8] by 3
+			if gridSign[0+i] + gridSign[1+i] + gridSign[2+i] == 3
+				drawLine(0, (i//3)*100 +50, 300, (i//3)*100 +50, "#CF0C23", 16)
+				won = true
+				console.log "X has won"
+			else if gridSign[0+i] + gridSign[1+i] + gridSign[2+i] == 0
+				drawLine(0, (i//3)*100 +50, 300, (i//3)*100 +50, "#0CB09D", 16)
+				won = true
+				console.log "O has won"
+			else if gridSign[0+(i//3)] + gridSign[3+(i//3)] + gridSign[6+(i//3)] == 3
+				drawLine((i//3)*100 + 50, 0, (i//3)*100 + 50, 300 , "#CF0C23", 16)
+				won = true
+				console.log "X has won"
+			else if gridSign[0+(i//3)] + gridSign[3+(i//3)] + gridSign[6+(i//3)] == 0
+				drawLine((i//3)*100 + 50, 0, (i//3)*100 + 50, 300 , "#0CB09D", 16)
+				won = true
+				console.log "O has won"
+			
+				
+		
 	drawLine = (x0, y0, x1, y1, color, lineWidth) ->
     	ctx.beginPath()
     	ctx.moveTo(x0,y0)
@@ -82,19 +143,6 @@ $ -> # Main Function, Draws Everything
 			#ctx.lineWidth = 2 
 			drawLine(x * 100 + p, y * 100 + p, x * 100 + 100 - p, y * 100 + 100 - p, "#CF0C23", 5)
 			drawLine(x * 100 + p, y * 100 + 100 - p, x * 100 + 100 - p, y * 100 + p, "#CF0C23", 5)
-		
-	#whereToDraw() ->
-		#console.log("e")
+	
 		drawGrid()
-		###
-		drawCircle(1,1)
-		drawCircle(0,0)
-		drawCircle(2,1)
-		drawCircle(1,2)
-		drawSWC(1,0)
-		drawSWC(2,0)
-		drawSWC(2,2)
-		drawSWC(0,1)
-		drawSWC(0,2)
-		###
 		console.log("end of initalise")
